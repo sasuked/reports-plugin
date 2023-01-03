@@ -1,0 +1,16 @@
+plugins {
+    alias(libs.plugins.shadowjar)
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation libs.jedis
+    implementation libs.mongodb
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,31 @@
+[versions]
+spigot = "1.8.8-R0.1-SNAPSHOT"
+lombok = "1.18.24"
+plugin-yml = "0.5.2"
+annotations = "22.0.0"
+inventory-framework = "2.5.4-rc.1"
+command-framework-bukkit = "1.2.0"
+jedis = "2.9.0"
+mongodb-driver = "4.5.1"
+caffeine = "2.9.3"
+bookapi = "1.6"
+luckperms = "5.4"
+
+
+
+[libraries]
+spigot = { module = "org.spigotmc:spigot", version.ref = "spigot" }
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+annotations = { module = "org.jetbrains:annotations", version.ref = "annotations" }
+inventory-framework = { module = "com.github.DevNatan.inventory-framework:inventory-framework", version.ref = "inventory-framework" }
+command-framework-bukkit = { module = "com.github.saiintbrisson.command-framework:bukkit", version.ref = "command-framework-bukkit" }
+jedis = { module = "redis.clients:jedis", version.ref = "jedis" }
+mongodb = { module = "org.mongodb:mongodb-driver-sync", version.ref = "mongodb-driver" }
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
+bookapi = {module = "xyz.upperlevel.spigot.book:spigot-book-api" , version.ref = "bookapi"}
+luckperms = { module = "net.luckperms:api", version.ref = "luckperms" }
+
+
+[plugins]
+shadowjar = { id = "com.github.johnrengelman.shadow", version = "7.1.2" }
+pluginbukkit = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "plugin-yml" }

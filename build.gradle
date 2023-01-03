@@ -1,0 +1,44 @@
+plugins {
+    id "com.diffplug.spotless" version "6.12.0" apply false
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: "com.diffplug.spotless"
+
+    group 'io.github.sasuked.reportsplugin'
+    version '1.0.0-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        annotationProcessor libs.lombok
+        compileOnlyApi libs.annotations
+        compileOnly libs.lombok
+    }
+
+    java {
+        withSourcesJar()
+        withJavadocJar()
+
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    spotless {
+        java {
+            removeUnusedImports()
+            palantirJavaFormat()
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+}

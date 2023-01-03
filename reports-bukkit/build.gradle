@@ -1,0 +1,32 @@
+plugins {
+    alias(libs.plugins.shadowjar)
+    alias(libs.plugins.pluginbukkit)
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.elmakers.com/repository/' }
+}
+
+dependencies {
+    implementation project(":reports-api")
+    implementation project(":reports-data")
+
+
+    implementation libs.bookapi
+    implementation libs.luckperms
+
+    compileOnly libs.spigot
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+bukkit {
+    name = 'ReportsPlugin'
+    main = 'io.github.sasuked.reportsplugin.ReportsPlugin'
+    website = 'https://github.com/sasuked'
+    version = "${project.version}"
+}

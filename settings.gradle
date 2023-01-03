@@ -1,0 +1,5 @@
+rootProject.name = 'reports-plugin'
+enableFeaturePreview('VERSION_CATALOGS')
+enableFeaturePreview('TYPESAFE_PROJECT_ACCESSORS')
+
+include "reports-api", "reports-bukkit", "reports-data"
