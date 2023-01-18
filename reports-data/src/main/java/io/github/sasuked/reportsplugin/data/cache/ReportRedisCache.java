@@ -11,6 +11,8 @@ import java.util.*;
 
 import static io.github.sasuked.reportsplugin.data.cache.ReportRedisInstrumentation.deserializeReport;
 
+
+// TODO find a way to self-expire cached reports in the redis
 @Log
 public class ReportRedisCache {
 
@@ -34,7 +36,7 @@ public class ReportRedisCache {
     public long put(@NotNull ReportData reportData) {
         try (Jedis jedis = pool.getResource()) {
             return jedis.hset(REPORTS_CACHE_KEY, reportData.getUniqueId().toString(), ReportRedisInstrumentation.toJson(reportData));
-        }catch (Exception e){
+        } catch (Exception e) {
             log.severe("Failed to put a report in the jedis cache: " + reportData.getUniqueId());
             return -1L;
         }
@@ -70,10 +72,9 @@ public class ReportRedisCache {
     @NotNull
     public List<ReportData> getCachedReports() {
         Set<String> keys = this.getReportCachedKeys();
+
         try (Jedis jedis = pool.getResource()) {
-
             List<ReportData> data = new ArrayList<>();
-
             for (String key : keys) {
                 if (!jedis.hexists(REPORTS_CACHE_KEY, key)) {
                     continue;
@@ -84,7 +85,12 @@ public class ReportRedisCache {
                     continue;
                 }
 
-                data.add(deserializeReport(value));
+                ReportData report = deserializeReport(value);
+                if (System.currentTimeMillis() >= report.getExpirationTime()) {
+                    invalidateReport(report);
+                } else {
+                    data.add(report);
+                }
             }
 
             return data;

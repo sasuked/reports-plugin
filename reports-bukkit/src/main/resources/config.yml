@@ -1,3 +1,18 @@
+# Note use 'PROD' here if the server
+# uses Redis & MongoDb to store reports.
+# or 'DEV' if you are testing in a local machine
+# without a database service.
+environment: DEV
+
+# Redis credentials
 redis:
   host: 'localhost'
   port: 3672
+
+
+# MongoDb Credentials
+mongo:
+  user: user
+  password: password
+  host: localhost
+  port: 3717

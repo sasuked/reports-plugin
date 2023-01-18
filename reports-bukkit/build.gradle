@@ -6,6 +6,8 @@ plugins {
 repositories {
     mavenCentral()
     maven { url = 'https://maven.elmakers.com/repository/' }
+    maven { url 'https://jitpack.io' }
+
 }
 
 dependencies {
@@ -14,10 +16,10 @@ dependencies {
 
 
     implementation libs.bookapi
-    implementation libs.luckperms
 
+    compileOnly libs.luckperms
     compileOnly libs.spigot
-
+    compileOnly libs.inventory.framework
 }
 
 test {
@@ -29,4 +31,5 @@ bukkit {
     main = 'io.github.sasuked.reportsplugin.ReportsPlugin'
     website = 'https://github.com/sasuked'
     version = "${project.version}"
+    depend = ['LuckPerms']
 }

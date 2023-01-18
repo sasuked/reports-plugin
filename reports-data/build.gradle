@@ -9,6 +9,7 @@ repositories {
 dependencies {
     implementation libs.jedis
     implementation libs.mongodb
+    implementation libs.caffeine
 }
 
 test {

@@ -14,8 +14,8 @@ public class ReportMappers {
     public static @NotNull Report mapFromData(@NotNull ReportData data) {
         return new ReportImpl(
           data.getUniqueId(),
-          data.getReportedPlayerId(),
-          data.getAuthorId(),
+          data.getReportedPlayerName(),
+          data.getAuthorName(),
           ReportType.valueOf(data.getType().toUpperCase()),
           data.getCreationTime(),
           data.getExpirationTime()
@@ -25,8 +25,8 @@ public class ReportMappers {
     public static @NotNull ReportData mapToData(@NotNull Report report) {
         return new ReportData(
           report.getUniqueId(),
-          report.getReportedPlayerId(),
-          report.getAuthorId(),
+          report.getReportedPlayerName(),
+          report.getAuthorName(),
           report.getType().name(),
           report.getCreationTime(),
           report.getExpirationTime()

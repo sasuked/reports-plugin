@@ -2,24 +2,16 @@ package io.github.sasuked.reportsplugin.command;
 
 import io.github.sasuked.reportsplugin.ReportsPlugin;
 import io.github.sasuked.reportsplugin.api.ReportType;
-import io.github.sasuked.reportsplugin.util.BookUtils;
+import io.github.sasuked.reportsplugin.book.ReportBooks;
+import io.github.sasuked.reportsplugin.util.PlayerProvider;
 import io.github.sasuked.reportsplugin.util.TagProvider;
-import net.md_5.bungee.api.chat.BaseComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import xyz.upperlevel.spigot.book.BookUtil;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import static xyz.upperlevel.spigot.book.BookUtil.ClickAction.runCommand;
-import static xyz.upperlevel.spigot.book.BookUtil.HoverAction.showText;
-import static xyz.upperlevel.spigot.book.BookUtil.TextBuilder.of;
 
 public class ReportCommand extends Command {
 
@@ -42,18 +34,15 @@ public class ReportCommand extends Command {
             return false;
         }
 
-        Player target = Bukkit.getOnlinePlayers().stream()
-          .filter(it -> it.getName().equalsIgnoreCase(args[0]))
-          .findAny()
-          .orElse(null);
-
+        Player target = PlayerProvider.getPlayer(args[0]);
         if (target == null) {
-            player.sendMessage("§c");
+            player.sendMessage("§cJogador inexistente ou offline.");
             return false;
         }
 
+        // /report <player> = Opens a menu to select the report reason.
         if (args.length == 1) {
-            BookUtils.openBook(player, buildItem(target));
+            BookUtil.openPlayer(player, ReportBooks.buildReportSelectionBook(target));
             player.playSound(player.getLocation(), Sound.ITEM_PICKUP, 1, 1);
             return false;
         }
@@ -64,55 +53,41 @@ public class ReportCommand extends Command {
             return false;
         }
 
-        plugin.getReportService().createReport(target.getUniqueId(), player.getUniqueId(), providedReason)
-          .whenCompleteAsync((report, throwable) -> {
-              if (throwable != null || report == null) {
-                  player.sendMessage("§cFalha no sistema interno de denuncias, por favor tente mais tarde.");
-                  player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1, 1);
-              } else {
-                  player.sendMessage(new String[]{
-                    "§a",
-                    "§a Obrigado por reportar " + TagProvider.getTagWithName(player) + " §apor:",
-                    "§8  ▪ §f" + providedReason.getName(),
-                    "§f",
-                    "§a Nossa equipe de moderação irá analisar o comportamento do jogador nas próximas horas.",
-                    "§7 A utilização inapropriada deste comando é passível de punição.",
-                    "§a"
-                  });
+        // /report <player> <motivo> = Opens the second menu to confirm the report or switch the current reason.
+        if (args.length == 2) {
+            BookUtil.openPlayer(player, ReportBooks.buildReportConfirmBook(target, providedReason));
+            return false;
+        }
 
-                  player.playSound(player.getLocation(), Sound.VILLAGER_YES, 1, 1);
-              }
-          });
+        // /report <player> <motivo> confirm = Confirms the selected reason and creates the report..
+        if (args[2].equalsIgnoreCase("confirm")) {
+            plugin.getReportService()
+              .createReport(target.getName(), player.getName(), providedReason)
+              .whenComplete((report, throwable) -> {
+                  if (throwable != null || report == null) {
+                      player.sendMessage("§cFalha no sistema interno de denuncias, por favor tente mais tarde.");
+                      player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1, 1);
+                  } else {
+                      player.sendMessage(new String[]{
+                        "§a",
+                        "§a Obrigado por reportar " + TagProvider.getTagWithName(player) + " §apor:",
+                        "§8  ▪ §f" + providedReason.getName(),
+                        "§f",
+                        "§a Nossa equipe de moderação irá analisar o comportamento do jogador nas próximas horas.",
+                        "§7 A utilização inapropriada deste comando é passível de punição.",
+                        "§a"
+                      });
 
+                      player.playSound(player.getLocation(), Sound.VILLAGER_YES, 1, 1);
+                  }
+              });
+
+            return true;
+        }
+
+        player.sendMessage("§cComando inválido! Use /report <player> para abrir o livro de denuncias!");
         return false;
     }
 
-    private ItemStack buildItem(Player player) {
-        String playerName = TagProvider.getTagWithName(player); // TODO formatted name with prefix
 
-        BookUtil.BookBuilder book = BookUtil.writtenBook();
-        book.title("Reports");
-        book.author("Sasuked piroca de tramontina");
-
-        BookUtil.PageBuilder pageBuilder = new BookUtil.PageBuilder();
-
-        List<BaseComponent> components = new ArrayList<>();
-        components.add(of("Reportando " + playerName).build());
-        components.add(of("§a").build());
-
-        for (ReportType reportType : ReportType.values()) {
-            components.add(of("§0 ▪ " + reportType.getName())
-              .onHover(showText(String.format("§7Clique para reportar §f%s§7!", player.getName())))
-              .onClick(runCommand("/report " + player.getName() + " " + reportType.name().toLowerCase()))
-              .build());
-        }
-
-        components.add(of("§a").build());
-        components.add(of("§aClique §a§lAQUI §apara reportar!").build());
-
-        pageBuilder.add(components.toArray(new BaseComponent[0]));
-
-        book.pages(pageBuilder.build());
-        return book.build();
-    }
 }
